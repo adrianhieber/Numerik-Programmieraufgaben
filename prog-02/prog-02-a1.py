@@ -1,4 +1,3 @@
-from sympy import *  # limit, Symbols
 import numpy as np
 
 
@@ -16,8 +15,51 @@ class Simple_DGL:
         return [self(self.a), self(self.b)]
 
     def rhs(self, x):
-        h = symbols("h")
-        return limit((self(x + h) - 2 * self(x) + self(x - h)) / (h * h), h, 0)
+        new = (self(x + 1) - 2 * self(x) + self(x - 1)) / (1 * 1)
+        delta = np.inf
+        for hpot in range(1, 8):
+            h = 10 ** (-hpot)
+            old = new
+            new = (self(x + h) - 2 * self(x) + self(x - h)) / (h * h)
+            if abs(new - old) > delta:
+                return old
+            delta = abs(new - old)
+        return new
+
+
+def solvePoisson(DGL, N=50, solver="Gauss"):
+    mdelta = (
+        (1 / (h**2)) * 2 * np.identity(N - 1)
+        - np.eye(N - 1, k=1)
+        - np.eye(N - 1, k=-1)
+    )
+    if N < 0:
+        raise Exception("N has to be positive")
+
+    if solver == "Gauss":
+        return  # TODO
+
+    if solver == "Cholesky":
+        return  # TODO
+
+    if solver == "numpy":
+        return np.linalg.solve(DGL)
+
+    raise Exception("Unkown solver, choose from Gauss, Cholesky or numpy.")
+
+
+def plot():
+    print()
+    # TODO
+
+
+# plot()
+
+
+def compare():
+    print("Compare:")
+    for i in range(1, 8):
+        print()
 
 
 def test():
