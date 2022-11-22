@@ -60,39 +60,40 @@ def solvePoisson(DGL, N=50, solver="Gauss"):
 def cholesky(A):
     """cholesky
     ========
-    Implementierung der Cholesky-Zerlegung nach Algorithmus 1.36 
+    Implementierung der Cholesky-Zerlegung nach Algorithmus 1.36
     der Vorlesung, optimiert.
     ----------
     Arguments:
-        A (np.array): A positive definite Matrix. 
-    
+        A (np.array): A positive definite Matrix.
+
     Returns:
         L (np.array): Untere Dreiecksmatrix.
-    """ 
+    """
     sizeA = np.shape(A)
 
     if sizeA[0] != sizeA[1]:
         raise ValueError("A ist nicht quadratisch.")
     if not issymmetric(A):
         raise ValueError("A ist nicht symmetrisch.")
-    
+
     n = sizeA[0]
     L = np.zeros((n, n))
 
     for j in range(0, n):
-        tmp = A[j, j] - np.sum(L[j,:j]**2)
+        tmp = A[j, j] - np.sum(L[j, :j] ** 2)
         # überprüfe ob der Radikand positiv ist
         if tmp < 0:
             raise RuntimeError("A ist nicht positiv definit!")
-        
+
         L[j, j] = np.sqrt(tmp)
         if j == 0:
-            L[1:,0] = A[1:,0] / L[0,0]
+            L[1:, 0] = A[1:, 0] / L[0, 0]
         else:
-            L[j+1:,j] = (A[j+1:,j] - L[j+1:,:j] @ L[j,:j]) / L[j, j]
+            L[j + 1 :, j] = (A[j + 1 :, j] - L[j + 1 :, :j] @ L[j, :j]) / L[j, j]
     return L
 
-def backSubstitution(R, y): #helper gauss
+
+def backSubstitution(R, y):  # helper gauss
     __checkMatrix(R, y, True)
     # has to be checked (can be called at any time, not only by solveLES)
     n = np.size(y)
@@ -140,7 +141,7 @@ def compare():
     varnames = ["Gauss", "Cholesky", "numpy"]
     var = np.empty(len(varnames))
     for i in range(0, len(varnames)):
-        #var[i] = np.empty(potNend - potNstart)
+        # var[i] = np.empty(potNend - potNstart)
         print()
 
     for pot in range(potNstart, potNend):

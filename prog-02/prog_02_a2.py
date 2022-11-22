@@ -98,22 +98,23 @@ def test():
         comp = compressed_img(org)()
         error = np.linalg.norm(org - comp) / np.linalg.norm(org)
         ax2.imshow(comp)
-        plt.title(f"Compressed(factor=1.0)\n(Error={round(error,4)*100}%)")
+        plt.title(f"Compressed(factor=1.0)\n(Error={round(error*100,2)}%)")
 
-        factor = 0.2
+        factor = 0.1
         ax3 = plt.subplot(2, 2, 3)
         comp2 = compressed_img(org, factor)()
         error = np.linalg.norm(org - comp2) / np.linalg.norm(org)
         ax3.imshow(comp2)
-        plt.title(f"Compressed(factor={factor})\n(Error={round(error,4)*100}%)")
+        plt.title(f"Compressed(factor={factor})\n(Error={round(error*100,2)}%)")
 
-        factor = 0.01
+        factor = 0.02
         ax4 = plt.subplot(2, 2, 4)
         comp3 = compressed_img(org, factor)()
         error = np.linalg.norm(org - comp3) / np.linalg.norm(org)
         ax4.imshow(comp3)
-        plt.title(f"Compressed(factor={factor})\n(Error={round(error,4)*100}%)")
+        plt.title(f"Compressed(factor={factor})\n(Error={round(error*100,2)}%)")
 
         plt.suptitle(f"Imagename: {pic}")
         fig.tight_layout()
+        plt.savefig("test.png")
         plt.show()
