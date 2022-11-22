@@ -116,5 +116,4 @@ def test():
 
         plt.suptitle(f"Imagename: {pic}")
         fig.tight_layout()
-        plt.savefig("test.png")
         plt.show()
