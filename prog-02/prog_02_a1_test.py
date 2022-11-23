@@ -1,5 +1,5 @@
 import numpy as np
-import prog_02_a1 as prog
+import poisson_skeleton as prog
 
 
 def test():
