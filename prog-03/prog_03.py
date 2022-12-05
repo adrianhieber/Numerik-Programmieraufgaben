@@ -2,20 +2,15 @@ import numpy as np
 import substitution_msl
 import matplotlib.pyplot as plt
 
-# just for test, delete after
-def isNaN(num):
-    return num != num
-
 
 def qr_householder(A, mode):
 
     # check for Matrix A
     m = A.shape[0]
     n = A.shape[1]
-    if not isinstance(A, np.ndarray):
-        raise Exception("Wasn willst du denn übergeben")
+
     if m < n:
-        raise Exception("Oi was willstn du, m nix kleiner n!")
+        raise Exception("for matrix A=Mat(mxn), m>=n")
 
     # calculate
     Q = np.eye(m, dtype=float)
@@ -24,12 +19,6 @@ def qr_householder(A, mode):
     for j in range(0, n):
         vs = R.copy()[j:m, j]  # warum muss hier ein copy hin??
         vs[0] = vs[0] - np.linalg.norm(vs)
-
-        ###warum zum teufel kann vs norm 0 oder nan
-        if isNaN(np.linalg.norm(vs)) or np.linalg.norm(vs) == 0:
-            print(vs)
-            print(np.linalg.norm(vs))
-            raise Exception("tf")
 
         vs = vs / np.linalg.norm(vs)
 
@@ -53,6 +42,9 @@ def qr_givens(A, mode):
 
 
 def qr(A, mode="full", alg="Householder"):
+    if not isinstance(A, np.ndarray):
+        raise Exception("usage: qr_householder(A, mode, alg), A has to be numpy array")
+
     if alg == "Householder":
         return qr_householder(A, mode)
     if alg == "Givens":
@@ -61,7 +53,7 @@ def qr(A, mode="full", alg="Householder"):
     raise Exception("Unknwon algortihm")
 
 
-def aii(m, n):
+def function_values(m, n):
     interval = [-3, 3]
 
     xi = np.linspace(interval[0], interval[1], m)
@@ -76,7 +68,7 @@ def aii(m, n):
     return xi, yi, p
 
 
-def reversed_horna(p, x):
+def reversed_horner(p, x):
     y = 0
     for a in p:
         y = y * x + a
@@ -89,13 +81,13 @@ def my_plot():
     m = 50
 
     for n in [5, 9, 20]:
-        xi, realy, p = aii(m, n)
+        xi, realy, p = function_values(m, n)
 
         if not realy_plotted:
             plt.plot(xi, realy, ".", label="y")
             realy_plotted = True
 
-        ylist = [reversed_horna(p, x) for x in xi]
+        ylist = [reversed_horner(p, x) for x in xi]
         plt.plot(xi, ylist, label=f"n={n}")
 
     plt.title(f"Comparison with m={m}")
