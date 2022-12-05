@@ -73,16 +73,30 @@ def aii(m, n):
 
     p = substitution_msl.backwardSubstitution(R, Q.T @ yi)
 
-    return xi, p
+    return xi,yi, p
 
+def reversed_horna(p,x):
+    y=0
+    for a in p:
+        y=y*x+a
+    return y
 
 def my_plot():
     fig = plt.figure()
-    # for i in range(5,10):
-    # n=2**i
-    xi, p = aii(100, 50)
-    plt.plot(xi, p, label=50)
-    ###hä irgendwie machts ja kein sinn xi mit m elementen und p mit n-1 elementen zu plotten
+    realy_plotted=False
+    m=80
+    
+    for n in [5,9,20]:
+        xi,realy, p = aii(m, n)
+        
+        if not realy_plotted:
+            plt.plot(xi, realy,'.', label="y")
+            realy_plotted=True
+        
+        ylist=[reversed_horna(p,x) for x in xi]
+        plt.plot(xi, ylist, label=f"n={n}")
+
+    plt.title("Comparison")
     plt.legend()
     plt.show()
 
