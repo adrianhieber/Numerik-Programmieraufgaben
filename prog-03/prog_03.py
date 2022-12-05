@@ -84,7 +84,7 @@ def reversed_horna(p,x):
 def my_plot():
     fig = plt.figure()
     realy_plotted=False
-    m=80
+    m=50
     
     for n in [5,9,20]:
         xi,realy, p = aii(m, n)
@@ -96,7 +96,7 @@ def my_plot():
         ylist=[reversed_horna(p,x) for x in xi]
         plt.plot(xi, ylist, label=f"n={n}")
 
-    plt.title("Comparison")
+    plt.title(f"Comparison with m={m}")
     plt.legend()
     plt.show()
 
