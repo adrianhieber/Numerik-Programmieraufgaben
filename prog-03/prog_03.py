@@ -43,8 +43,8 @@ def qr_givens(A, mode):
     R = np.array(A.copy(), dtype=float)
 
     #calculate
-    for i in range(1, m):
-        for j in range(0, n):
+    for j in range(1, n):
+        for i in range(j+1, m):
 
             a1 = R[j, j]
             a2 = R[i, j]
@@ -52,15 +52,35 @@ def qr_givens(A, mode):
             c = a1 / anorm
             s = -a2 / anorm
 
-            Qij = np.eye(m, dtype=float)
-            Qij[i, i] = c
-            Qij[j, j] = c
-            Qij[i, j] = s
-            Qij[j, i] = -s
-
-            R = np.dot(Qij, R)
+            #somehow i messed up with indizes and thats why it fails
+            #I blame it on the Gluehwein xD
+            R[i,:]= c*R[i,:]-s*R[j,:]
+            R[j,:]= c*R[j,:]+s*R[i,:]
             if mode != "R":
-                Q = np.dot(Q, Qij.T)
+                Q[:,j] = c*Q[:,j] + s*Q[:,i];
+                Q[:,i] = -s*Q[:,j] + c*Q[:,i];
+                
+##    #this gives correct answers, but calculates not only the rows :
+##
+##    for i in range(1, m):
+##        for j in range(0, n):
+##
+##            a1 = R[j, j]
+##            a2 = R[i, j]
+##            anorm = np.linalg.norm(np.array([a1, a2]))
+##            c = a1 / anorm
+##            s = -a2 / anorm
+##
+##            Qij = np.eye(m, dtype=float)
+##            Qij[i, i] = c
+##            Qij[j, j] = c
+##            Qij[i, j] = s
+##            Qij[j, i] = -s
+##
+##            R = np.dot(Qij, R)
+##            if mode != "R":
+##                Q = np.dot(Q, Qij.T)
+                
                 
     # return based on mode
     if mode == "full":
@@ -132,8 +152,11 @@ def my_plot(alg):
     plt.show()
 
 def compare_alg():
+
+    print("Test with sparse matrix")
+    
     #make sparse matrix
-    m=200
+    m=100
     E1=np.eye(m,k=0)
     E2=np.eye(m,k=-1)
     v1=np.random.rand(1,m)
@@ -150,8 +173,13 @@ def compare_alg():
     qr(A,alg="Givens")
     t_givens_stop=time.perf_counter()
 
-    print(f"Houseolder: {t_householder_stop - t_householder_start}s")
+    print(f"Householder: {t_householder_stop - t_householder_start}s")
     print(f"Givens: {t_givens_stop - t_givens_start}s")
+
+    #conclusion
+    print()
+    print("Theoretically, Givens' algorithm should be faster for sparse matrices.")
+    print("But since this is not the case, my implementation is most likely not the most efficient.")
     
 
 
@@ -165,5 +193,5 @@ if __name__ == "__main__":
     my_plot(alg="Givens")
     #Comparison with sparse matrices:
     compare_alg()
-    input()
+    input("\nPress Enter to close.")
     
