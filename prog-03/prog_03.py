@@ -41,29 +41,6 @@ def qr_householder(A, mode):
 def qr_givens(A, mode):
     pass
 
-def qr_givens_online(A,mode):
-    m, n = A.shape
-    Q = np.eye(m)  # Initialize Q as the identity matrix
-    R = A.copy()   # Initialize R as a copy of A
-    
-    # Iterate over the columns of R
-    for i in range(n):
-        # Iterate over the rows of R, starting from the i-th row
-        for j in range(i+1, m):
-            # Compute the Givens rotation matrix that zeros out the (j, i) element of R
-            G = np.eye(m)
-            r = np.sqrt(R[i, i]**2 + R[j, i]**2)
-            c = R[i, i] / r
-            s = -R[j, i] / r
-            G[[i, j], [i, j]] = c
-            G[i, j] = s
-            G[j, i] = -s
-            
-            # Apply the Givens rotation to R and Q
-            R = np.dot(G, R)
-            Q = np.dot(Q, G.T)
-            
-    return Q[:m, :n], R[:n, :n]
 
 def _givens_rotation_matrix_entries(a, b):
     """Compute matrix entries for Givens rotation."""
