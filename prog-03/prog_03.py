@@ -1,6 +1,7 @@
 import numpy as np
-import substitution_msl
+import substitution_mlsg
 import matplotlib.pyplot as plt
+import time
 
 
 def qr_householder(A, mode):
@@ -97,7 +98,7 @@ def function_values(m, n, alg):
     V = np.vander(xi, n)
     Q, R = qr(V, mode="reduced",alg=alg)
 
-    p = substitution_msl.backwardSubstitution(R, Q.T @ yi)
+    p = substitution_mlsg.backwardSubstitution(R, Q.T @ yi)
 
     return xi, yi, p
 
@@ -111,16 +112,18 @@ def reversed_horner(p, x):
 
 def my_plot(alg):
     fig = plt.figure()
-    realy_plotted = False
+    true_y_plotted = False
     m = 50
 
     for n in [5, 9, 20]:
         xi, realy, p = function_values(m, n,alg)
 
-        if not realy_plotted:
+        #plot true y
+        if not true_y_plotted:
             plt.plot(xi, realy, ".", label="y")
-            realy_plotted = True
+            true_y_plotted = True
 
+        #evaluate and plot polynomial
         ylist = [reversed_horner(p, x) for x in xi]
         plt.plot(xi, ylist, label=f"n={n}")
 
@@ -128,7 +131,39 @@ def my_plot(alg):
     plt.legend()
     plt.show()
 
+def compare_alg():
+    #make sparse matrix
+    m=200
+    E1=np.eye(m,k=0)
+    E2=np.eye(m,k=-1)
+    v1=np.random.rand(1,m)
+    v2=np.random.rand(1,m)
+    A=v1*E1+v2*E2
+
+    #stop time Householder
+    t_householder_start=time.perf_counter()
+    qr(A,alg="Householder")
+    t_householder_stop=time.perf_counter()
+
+    #stop time Givens
+    t_givens_start=time.perf_counter()
+    qr(A,alg="Givens")
+    t_givens_stop=time.perf_counter()
+
+    print(f"Houseolder: {t_householder_stop - t_householder_start}s")
+    print(f"Givens: {t_givens_stop - t_givens_start}s")
+    
+
 
 if __name__ == "__main__":
+    
     #a1 visualize:
     my_plot(alg="Householder")
+
+    #a2
+    #test givens:
+    my_plot(alg="Givens")
+    #Comparison with sparse matrices:
+    compare_alg()
+    input()
+    
