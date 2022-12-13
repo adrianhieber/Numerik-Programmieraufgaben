@@ -41,6 +41,19 @@ def newton_like(f, x_0, dfz=None, x_1=None, tol=1e-8, max_iter=50, variant="stan
 
 
 class func:
+    def __init__(self, f, f_der):
+        self.f = f
+        self.f_der = f_der
+
+    def __call__(self, x):
+        return self.f(x)
+
+    def derivative(self, x):
+        return self.f_der(x)
+
+
+#bruacht man nicht, willst aber noch nicht loeschen
+class func_with_numeric_derivative:
     def __init__(self, f, n, m):
         self.f = f
         self.n = n
@@ -76,22 +89,30 @@ class func:
 def test():
     # f: R^n->R^m
     # mytest
-    f_abc = func(f=lambda x: (x[0], x[1], x[0] + x[1]), n=2, m=3)
+    f_abc = func_with_numeric_derivative(f=lambda x: (x[0], x[1], x[0] + x[1]), n=2, m=3)
 
     # f1
-    f_1 = func(f=lambda x: (1 / np.tan(x)), n=1, m=1)
+    
+    f_1 = lambda x: (1 / np.tan(x))
+    f_1_der = lambda x: (-1 / np.sin(x)**2)
+    f_1_func = func(f=f_1, f_der=f_1_der)
 
     # f2
-    f_2 = func(f=lambda x: (np.sin(x[0] + np.cos(x[2]))), n=2, m=1)
+    f_2_func = func_with_numeric_derivative(f=lambda x: (np.sin(x[0] + np.cos(x[2]))), n=2, m=1)
 
     # f3
     n = 3  # just test
-    f_2 = func(
+    f_2_func = func_with_numeric_derivative(
         f=lambda x: (sum([np.exp(-(x[i] ** 2)) - n for i in range(n)])), n=n, m=1
     )
-
-    f1_test=newton_like(f=f_1, x_0=4, x_1=8, variant="secant")
+    
+    #f1 test secant
+    f1_test=newton_like(f=f_1_func, x_0=4, x_1=8, variant="secant")
     print(f1_test)
+
+    #not working rn
+    #f2_test=newton_like(f=f_2_func, x_0=4, x_1=8, variant="secant")
+    #print(f2_test)
 
 
 if __name__ == "__main__":
