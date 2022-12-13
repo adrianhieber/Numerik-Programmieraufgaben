@@ -7,12 +7,31 @@ def newton_like(f, x_0, dfz=None, x_1=None, tol=1e-8, max_iter=50, variant="stan
     # fange bullshit noch ab
 
     if variant == "standard":
-        # use f.derivative(x)
-        pass
+        # TODO pruefen ob konvergiert
+        x_k = x_0
+        x_k2 = x_k - f(x_k) / f.derivative(x)
+        n_iter = 0
+        while abs(x_k2 - x_k) > tol and n_iter < max_iter:
+            x_k = x_k2 if x_k != x_0 else x_0
+            x_k2 = x_k - f(x_k) / f.derivative(x)
+            n_iter += 1
+        return x_k2
 
     if variant == "secant":
-        # x_1 has to be used
-        pass
+        x_k_m1 = x_0
+        x_k = x_1
+        x_k_p1 = x_k - ((x_k - x_k_m1) / (f(x_k) - f(x_k_m1))) *f(x_k)
+        n_iter = 0
+        
+        while abs(x_k_p1 - x_k) > tol and n_iter < max_iter:
+            
+            x_k_m1 = x_k
+            x_k = x_k_p1 
+            x_k_p1 = x_k - ((x_k - x_k_m1) / (f(x_k) - f(x_k_m1))) *f(x_k)
+            n_iter += 1
+                
+        print("Iterations:",n_iter)
+        return x_k_p1
 
     if variant == "simple":
         # blatt 8
@@ -71,7 +90,8 @@ def test():
         f=lambda x: (sum([np.exp(-(x[i] ** 2)) - n for i in range(n)])), n=n, m=1
     )
 
-    print(f_2.derivative([1, 2, 3]))
+    f1_test=newton_like(f=f_1, x_0=4, x_1=8, variant="secant")
+    print(f1_test)
 
 
 if __name__ == "__main__":
