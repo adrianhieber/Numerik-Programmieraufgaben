@@ -18,7 +18,6 @@ class Vandermonde_model:
 
 class Lagrange_model:
     def fit(self, x, y):
-        # baryzentrische Gewicht
         self.x = x
         self.y = y
         self.w = [
@@ -32,8 +31,24 @@ class Lagrange_model:
         ) / sum([self.w[k] / (x - self.x[k]) for k in range(len(self.y))])
 
     def add_points(self, x, y):
-        # TODO
-        pass
+        meas_num_old = len(self.x)
+        self.x = np.append(self.x, x)
+        self.y = np.append(self.y, y)
+        mult_to_w = [
+            prod(
+                1 / (self.x[k] - self.x[i]) if i != k else 1
+                for i in range(meas_num_old, len(self.x))
+            )
+            for k in range(meas_num_old)
+        ]
+        self.w = np.array(self.w) * np.array(mult_to_w)
+        w_to_app = [
+            prod(
+                1 / (self.x[k] - self.x[i]) if i != k else 1 for i in range(len(self.x))
+            )
+            for k in range(meas_num_old, len(self.x))
+        ]
+        self.w = np.append(self.w, w_to_app)
 
 
 class Newton_model:
@@ -60,6 +75,8 @@ def test():
 
 
 def test_stutzwerte():
+    x_notall = np.array([-1, 0])
+    y_notall = np.array([-1, 3])
     x = np.array([-1, 0, 2, 3])
     y = np.array([-1, 3, 11, 27])
 
@@ -69,15 +86,30 @@ def test_stutzwerte():
     model = [Vandermonde_model(), Lagrange_model()]
     for mode in model:
         print(mode)
+
+        # standart
         mode.fit(x, y)
         if [np.isclose(mode(x_test[i]), y_test[i]) for i in range(len(x_test))] == [
             True for i in range(len(x_test))
         ]:
-            print("Stutzwerttest erfolgreich")
+            print("Stutzwerttest standart erfolgreich")
         else:
-            print("Stutzwerttest failed")
+            print("Stutzwerttest satndart failed")
             print([mode(x_test[i]) for i in range(len(x_test))])
             print("exp:", y_test)
+
+        # add
+        mode.fit(x_notall, y_notall)
+        mode.add_points([2, 3], [11, 27])
+        if [np.isclose(mode(x_test[i]), y_test[i]) for i in range(len(x_test))] == [
+            True for i in range(len(x_test))
+        ]:
+            print("Stutzwerttest add erfolgreich")
+        else:
+            print("Stutzwerttest add failed")
+            print([mode(x_test[i]) for i in range(len(x_test))])
+            print("exp:", y_test)
+
         print()
 
 
