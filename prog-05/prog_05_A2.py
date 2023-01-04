@@ -1,43 +1,85 @@
+from prog_05_A1 import Horner_polyval as horner
 import numpy as np
-import matplotlib.pyplot as plt
-import time
+from math import prod
 
-def simple_polyval(x, p):
-    return sum([p_i * x**i for i, p_i in enumerate(reversed(p))])
 
-def Horner_polyval(x, a):
-    sum=0
-    for i, p in enumerate(a):
-        sum = sum * x + p
-    return sum
+class Vandermonde_model:
+    def fit(self, x, y):
+        vander = np.vander(x, increasing=True)
+        self.p = np.flip(np.linalg.solve(vander, y))
 
-def compare():
-    #example
-    x=2.3
-    p=[2,5,6,8,13,7,4,25,74]
-    
-    #measure
-    simple_start = time.perf_counter()
-    simple_polyval(x, p)
-    simple_time = time.perf_counter()- simple_start
+    def __call__(self, x):
+        return horner(x, self.p)
 
-    horner_start = time.perf_counter()
-    Horner_polyval(x, p)
-    horner_time = time.perf_counter() - horner_start
+    def add_points(self, x, y):
+        # TODO
+        pass
 
-    numpy_start = time.perf_counter()
-    np.polyval(p,x)
-    numpy_time = time.perf_counter() - numpy_start
-    
-    #plot
-    compare_names=["Simple", "Horner", "numpy"]
-    compare_times=[simple_time, horner_time, numpy_time]
-    fig = plt.figure()
-    plt.bar(compare_names, compare_times)
-    plt.xlabel("Method")
-    plt.ylabel("Time in s")
-    plt.title("Comparison with deg(p)=" + str(len(p)-1))
-    plt.show()
+
+class Lagrange_model:
+    def fit(self, x, y):
+        # baryzentrische Gewicht
+        self.x = x
+        self.y = y
+        self.w = [
+            prod(1 / (x[k] - x[i]) if i != k else 1 for i in range(len(x)))
+            for k in range(len(x))
+        ]
+
+    def __call__(self, x):
+        return sum(
+            [self.y[k] * (self.w[k] / (x - self.x[k])) for k in range(len(self.y))]
+        ) / sum([self.w[k] / (x - self.x[k]) for k in range(len(self.y))])
+
+    def add_points(self, x, y):
+        # TODO
+        pass
+
+
+class Newton_model:
+    def fit(self, x, y):
+        # TODO
+        pass
+
+    def __call__(self, x):
+        return horner(x, self.p)
+
+    def add_points(self, x, y):
+        # TODO
+        pass
+
+
+def test():
+    x = np.array([-1, 0, 2, 3])
+    y = np.array([-1, 3, 11, 27])
+    mode = Lagrange_model()
+    mode.fit(x, y)
+    print(mode(0.5))
+    print(mode(-2))
+    print(mode(5))
+
+
+def test_stutzwerte():
+    x = np.array([-1, 0, 2, 3])
+    y = np.array([-1, 3, 11, 27])
+
+    x_test = np.array([-2, 0.5, 1, 4])
+    y_test = np.array([-13, 3.875, 5, 59])
+
+    model = [Vandermonde_model(), Lagrange_model()]
+    for mode in model:
+        print(mode)
+        mode.fit(x, y)
+        if [np.isclose(mode(x_test[i]), y_test[i]) for i in range(len(x_test))] == [
+            True for i in range(len(x_test))
+        ]:
+            print("Stutzwerttest erfolgreich")
+        else:
+            print("Stutzwerttest failed")
+            print([mode(x_test[i]) for i in range(len(x_test))])
+            print("exp:", y_test)
+        print()
+
 
 if __name__ == "__main__":
-    compare()
+    test_stutzwerte()
